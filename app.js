@@ -10,20 +10,21 @@ const flashOverlay = document.getElementById('flashOverlay');
 let currentStream = null;
 let useFrontCamera = false;
 
-// Estructura de ubicaciones por grupos con colores asignados
+// Estructura de ubicaciones por grupos con indicadores visuales de color (Emojis)
+// Los emojis se usan para compatibilidad total en móviles
 const defaultGroups = [
-    { label: "Clinique", color: "grp-gray", items: ["Ascenseur 1", "RC"] },
-    { label: "Jean-Coutu", color: "grp-pink", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
-    { label: "Sporting Life", color: "grp-pink", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
-    { label: "Siam", color: "grp-orange", items: ["Ascenseur 1", "Ascenseur 2"] },
-    { label: "Huston Orange", color: "grp-orange", items: ["Ascenseur 1"] },
-    { label: "Banque National", color: "grp-red", items: ["Ascenseur 1", "Ascenseur 2", "RC 1", "RC 2"] },
-    { label: "Hôtel Escad", color: "grp-blue", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
-    { label: "Apple & Pottery", color: "grp-blue", items: ["RC", "Ascenseur 1"] },
-    { label: "Mon Coco 2e", color: "grp-yellow", items: ["Zamboni"] },
-    { label: "Mon Coco RC 1", color: "grp-yellow", items: ["Ascenseur 1", "Ascenseur 2", "RC (A)", "RC (B)", "RC (C)"] },
-    { label: "Mon Coco RC 2", color: "grp-yellow", items: ["RC (A)", "RC (B)"] },
-    { label: "Huston", color: "grp-gray", items: ["RC"] }
+    { label: "⚪ Clinique", items: ["Ascenseur 1", "RC"] },
+    { label: "🌸 Jean-Coutu", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "🌸 Sporting Life", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "🟠 Siam", items: ["Ascenseur 1", "Ascenseur 2"] },
+    { label: "🟠 Huston Orange", items: ["Ascenseur 1"] },
+    { label: "🔴 Banque National", items: ["Ascenseur 1", "Ascenseur 2", "RC 1", "RC 2"] },
+    { label: "🔵 Hôtel Escad", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "🔵 Apple & Pottery", items: ["RC", "Ascenseur 1"] },
+    { label: "🟡 Mon Coco 2e", items: ["Zamboni"] },
+    { label: "🟡 Mon Coco RC 1", items: ["Ascenseur 1", "Ascenseur 2", "RC (A)", "RC (B)", "RC (C)"] },
+    { label: "🟡 Mon Coco RC 2", items: ["RC (A)", "RC (B)"] },
+    { label: "⚪ Huston", items: ["RC"] }
 ];
 
 // Cargar personalizadas de localStorage
@@ -61,18 +62,19 @@ function switchCamera() {
 function renderLocations() {
     let html = '';
     
-    // Renderizar grupos predeterminados con clases de color
+    // Renderizar grupos predeterminados
     defaultGroups.forEach(group => {
-        html += `<optgroup label="${group.label}" class="${group.color}">`;
+        html += `<optgroup label="${group.label}">`;
         group.items.forEach(item => {
-            html += `<option value="${group.label} - ${item}" class="text-white bg-slate-800">${item}</option>`;
+            // El valor de la opción mantiene el emoji para identificarlo al capturar
+            html += `<option value="${group.label} - ${item}">${item}</option>`;
         });
         html += `</optgroup>`;
     });
 
     // Renderizar grupo de personalizadas si existen
     if (customLocations.length > 0) {
-        html += `<optgroup label="Especiales" class="text-slate-400">`;
+        html += `<optgroup label="📍 Especiales">`;
         customLocations.forEach(loc => {
             html += `<option value="${loc}">${loc}</option>`;
         });
@@ -101,7 +103,11 @@ captureBtn.onclick = () => {
     setTimeout(() => flashOverlay.classList.remove('flash'), 200);
 
     const ctx = canvas.getContext('2d');
-    const locText = locationSelect.value;
+    
+    // Obtener el texto y LIMPIAR los emojis para el sello final
+    let locText = locationSelect.value;
+    // Regex para eliminar emojis y símbolos decorativos del sello
+    locText = locText.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2B50}\u{2B55}\u{26AA}\u{26AB}]/gu, '').trim();
 
     // Configurar tamaño según el video
     canvas.width = video.videoWidth;
@@ -109,7 +115,7 @@ captureBtn.onclick = () => {
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Diseño del Sello mejorado
+    // Diseño del Sello
     const padding = canvas.width * 0.04;
     const fontSize = canvas.width * 0.05;
 
@@ -131,7 +137,7 @@ captureBtn.onclick = () => {
         ctx.fillRect(x, y, rectW, rectH);
     }
 
-    // Dibujar Texto
+    // Dibujar Texto limpio (sin emojis)
     ctx.fillStyle = "#ffffff";
     ctx.fillText(locText, x + padding, y + (fontSize * 1.05));
 
@@ -151,7 +157,6 @@ async function sharePhoto() {
         const file = new File([blob], `Reporte.jpg`, { type: 'image/jpeg' });
 
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-            // Se eliminó el parámetro 'text' para no enviar mensaje redundante por WhatsApp
             await navigator.share({
                 files: [file],
                 title: 'Foto de Trabajo'
@@ -167,7 +172,8 @@ async function sharePhoto() {
 
 function downloadPhoto() {
     const link = document.createElement('a');
-    link.download = `FOTO_${locationSelect.value.replace(/[^a-z0-9]/gi, '_')}.jpg`;
+    let cleanName = locationSelect.value.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}]/gu, '').trim();
+    link.download = `FOTO_${cleanName.replace(/[^a-z0-9]/gi, '_')}.jpg`;
     link.href = photoPreview.src;
     link.click();
 }
