@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Cámara Laboral Premium</title>
+    <title>Registro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -91,9 +91,10 @@
         <!-- Panel de Selección (Bottom Sheet) -->
         <div id="selectorPanel" class="fixed inset-0 z-[200] hidden">
             <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" onclick="closeSelector()"></div>
-            <div id="sheetContent" class="absolute bottom-0 left-0 right-0 bg-slate-900 rounded-t-[2.5rem] max-h-[85vh] overflow-hidden flex flex-col shadow-2xl transform translate-y-full transition-transform duration-300">
+            <div id="sheetContent"
+                class="absolute bottom-0 left-0 right-0 bg-slate-900 rounded-t-[2.5rem] max-h-[85vh] overflow-hidden flex flex-col shadow-2xl transform translate-y-full transition-transform duration-300">
                 <div class="w-12 h-1.5 bg-slate-700 rounded-full mx-auto my-4"></div>
-                
+
                 <div class="p-4 border-b border-slate-800 flex justify-between items-center">
                     <h3 class="text-xl font-bold">Seleccionar Ubicación</h3>
                     <button onclick="closeSelector()" class="bg-slate-800 p-2 rounded-full">✕</button>

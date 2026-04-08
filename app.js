@@ -44,9 +44,7 @@ let currentSelection = {
 
 // Iniciar cámara
 async function startCamera() {
-    if (currentStream) {
-        currentStream.getTracks().forEach(track => track.stop());
-    }
+    stopCamera();
     const constraints = {
         video: { facingMode: useFrontCamera ? "user" : "environment", width: { ideal: 1920 }, height: { ideal: 1080 } }
     };
@@ -54,6 +52,14 @@ async function startCamera() {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         video.srcObject = currentStream;
     } catch (err) { alert("Permisos de cámara denegados."); }
+}
+
+function stopCamera() {
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+        video.srcObject = null;
+    }
 }
 
 function switchCamera() {
@@ -165,10 +171,14 @@ captureBtn.onclick = () => {
     ctx.fillText(locText, circleX + circleRadius + (padding * 0.5), y + (fontSize * 1.25));
 
     photoPreview.src = canvas.toDataURL('image/jpeg', 0.85);
+    stopCamera();
     resultArea.classList.remove('hidden');
 };
 
-function resetCamera() { resultArea.classList.add('hidden'); }
+async function resetCamera() {
+    await startCamera();
+    resultArea.classList.add('hidden');
+}
 
 async function sharePhoto() {
     try {
@@ -195,3 +205,15 @@ window.onload = () => {
     renderSelector();
     selectLocation(defaultGroups[0].label, defaultGroups[0].items[0], defaultGroups[0].color, defaultGroups[0].dotClass);
 };
+
+// Auto-pausa al cambiar de pestaña o minimizar para ahorrar batería
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        stopCamera();
+    } else {
+        // Solo reinicia si el modal de resultado está oculto (modo captura)
+        if (resultArea.classList.contains('hidden')) {
+            startCamera();
+        }
+    }
+});
