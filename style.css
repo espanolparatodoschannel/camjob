@@ -1,0 +1,44 @@
+body {
+    touch-action: manipulation;
+    overscroll-behavior: none;
+    background-color: #0f172a;
+}
+
+#photoCanvas {
+    display: none;
+}
+
+.camera-view {
+    position: relative;
+    width: 100%;
+    height: 70vh;
+    background: #000;
+    overflow: hidden;
+    border-radius: 1.5rem;
+}
+
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Animación de flash al tomar foto */
+.flash {
+    animation: flashAnim 0.2s ease-out;
+}
+
+@keyframes flashAnim {
+    0% {
+        opacity: 1;
+        background: white;
+    }
+
+    100% {
+        opacity: 0;
+    }
+}
+
+.btn-active:active {
+    transform: scale(0.95);
+}
