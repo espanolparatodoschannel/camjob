@@ -10,20 +10,20 @@ const flashOverlay = document.getElementById('flashOverlay');
 let currentStream = null;
 let useFrontCamera = false;
 
-// Estructura de ubicaciones por grupos
+// Estructura de ubicaciones por grupos con colores asignados
 const defaultGroups = [
-    { label: "Clinique", items: ["Ascenseur 1", "RC"] },
-    { label: "Jean-Coutu", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
-    { label: "Sporting Life", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
-    { label: "Siam", items: ["Ascenseur 1", "Ascenseur 2"] },
-    { label: "Huston Orange", items: ["Ascenseur 1"] },
-    { label: "Banque National", items: ["Ascenseur 1", "Ascenseur 2", "RC 1", "RC 2"] },
-    { label: "Hôtel Escad", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
-    { label: "Apple & Pottery", items: ["RC", "Ascenseur 1"] },
-    { label: "Mon Coco 2e", items: ["Zamboni"] },
-    { label: "Mon Coco RC 1", items: ["Ascenseur 1", "Ascenseur 2", "RC (A)", "RC (B)", "RC (C)"] },
-    { label: "Mon Coco RC 2", items: ["RC (A)", "RC (B)"] },
-    { label: "Huston", items: ["RC"] }
+    { label: "Clinique", color: "grp-gray", items: ["Ascenseur 1", "RC"] },
+    { label: "Jean-Coutu", color: "grp-pink", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "Sporting Life", color: "grp-pink", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "Siam", color: "grp-orange", items: ["Ascenseur 1", "Ascenseur 2"] },
+    { label: "Huston Orange", color: "grp-orange", items: ["Ascenseur 1"] },
+    { label: "Banque National", color: "grp-red", items: ["Ascenseur 1", "Ascenseur 2", "RC 1", "RC 2"] },
+    { label: "Hôtel Escad", color: "grp-blue", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "Apple & Pottery", color: "grp-blue", items: ["RC", "Ascenseur 1"] },
+    { label: "Mon Coco 2e", color: "grp-yellow", items: ["Zamboni"] },
+    { label: "Mon Coco RC 1", color: "grp-yellow", items: ["Ascenseur 1", "Ascenseur 2", "RC (A)", "RC (B)", "RC (C)"] },
+    { label: "Mon Coco RC 2", color: "grp-yellow", items: ["RC (A)", "RC (B)"] },
+    { label: "Huston", color: "grp-gray", items: ["RC"] }
 ];
 
 // Cargar personalizadas de localStorage
@@ -61,18 +61,18 @@ function switchCamera() {
 function renderLocations() {
     let html = '';
     
-    // Renderizar grupos predeterminados
+    // Renderizar grupos predeterminados con clases de color
     defaultGroups.forEach(group => {
-        html += `<optgroup label="${group.label}">`;
+        html += `<optgroup label="${group.label}" class="${group.color}">`;
         group.items.forEach(item => {
-            html += `<option value="${group.label} - ${item}">${item}</option>`;
+            html += `<option value="${group.label} - ${item}" class="text-white bg-slate-800">${item}</option>`;
         });
         html += `</optgroup>`;
     });
 
     // Renderizar grupo de personalizadas si existen
     if (customLocations.length > 0) {
-        html += `<optgroup label="Especiales">`;
+        html += `<optgroup label="Especiales" class="text-slate-400">`;
         customLocations.forEach(loc => {
             html += `<option value="${loc}">${loc}</option>`;
         });
@@ -89,7 +89,7 @@ function addLocation() {
         localStorage.setItem('work_custom_locs_v5', JSON.stringify(customLocations));
         renderLocations();
         newLocationInput.value = '';
-        locationSelect.selectedIndex = locationSelect.options.length - 1; // Seleccionar la última añadida
+        locationSelect.selectedIndex = locationSelect.options.length - 1;
     }
 }
 
@@ -121,7 +121,7 @@ captureBtn.onclick = () => {
     const x = padding;
     const y = canvas.height - rectH - padding;
 
-    // Dibujar fondo del sello con algo más de transparencia para que sea premium
+    // Dibujar fondo del sello
     ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
     if (ctx.roundRect) {
         ctx.beginPath();
@@ -151,10 +151,10 @@ async function sharePhoto() {
         const file = new File([blob], `Reporte.jpg`, { type: 'image/jpeg' });
 
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            // Se eliminó el parámetro 'text' para no enviar mensaje redundante por WhatsApp
             await navigator.share({
                 files: [file],
-                title: 'Foto de Trabajo',
-                text: `Ubicación: ${locationSelect.value}`
+                title: 'Foto de Trabajo'
             });
         } else {
             downloadPhoto();

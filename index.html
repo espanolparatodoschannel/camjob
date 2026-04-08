@@ -17,7 +17,7 @@
         <header class="flex justify-between items-center py-2 mb-2">
             <div>
                 <h1 class="text-xl font-bold text-blue-400">Cámara Laboral</h1>
-                <p class="text-xs text-slate-400">Solo ubicación</p>
+                <p class="text-xs text-slate-400">Control de Proceso</p>
             </div>
             <div class="flex gap-2">
                 <button onclick="switchCamera()"
@@ -29,9 +29,9 @@
         <div class="bg-slate-800 p-4 rounded-2xl mb-4 border border-slate-700 shadow-xl">
             <div class="flex flex-col gap-3">
                 <div class="relative">
-                    <label class="text-[10px] uppercase font-bold text-slate-500 ml-1">📍 Ubicación seleccionada</label>
+                    <label class="text-[10px] uppercase font-bold text-slate-500 ml-1">📍 Selección de Área</label>
                     <select id="locationSelect"
-                        class="w-full mt-1 p-4 bg-slate-700 text-white border-none rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-lg appearance-none shadow-inner">
+                        class="w-full mt-1 p-4 bg-slate-700 text-white border-none rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-lg appearance-none shadow-inner font-bold">
                         <!-- Cargado por JS -->
                     </select>
                     <div class="absolute right-4 bottom-4 pointer-events-none opacity-50">▼</div>
@@ -54,21 +54,20 @@
             <!-- Guía visual del sello -->
             <div class="absolute bottom-4 left-4 pointer-events-none">
                 <div class="bg-black/30 backdrop-blur-sm border border-white/10 rounded-lg p-2 flex flex-col gap-1">
-                    <div class="w-24 h-3 bg-blue-500/50 rounded-full"></div>
+                    <div class="w-16 h-2 bg-white/20 rounded-full"></div>
                 </div>
             </div>
         </div>
 
         <!-- Botón de Disparo Principal -->
-        <div class="mt-auto pb-10 flex flex-col items-center gap-2">
+        <div class="mt-auto pb-8 flex flex-col items-center gap-2">
             <button id="captureBtn"
-                class="w-24 h-24 bg-white rounded-full shadow-2xl flex items-center justify-center p-2 btn-active">
-                <div
-                    class="w-full h-full rounded-full border-4 border-slate-900 bg-slate-50 flex items-center justify-center">
-                    <span class="text-3xl text-slate-900">📸</span>
+                class="w-24 h-24 rounded-full shadow-2xl flex items-center justify-center btn-active">
+                <div class="inner-ring">
+                    <div class="shutter-button"></div>
                 </div>
             </button>
-            <span class="text-slate-500 text-[10px] font-bold tracking-widest uppercase mt-2">Capturar</span>
+            <span class="text-slate-500 text-[10px] font-bold tracking-widest uppercase mt-3">Capturar Registro</span>
         </div>
 
         <!-- Modal de Resultado -->
@@ -87,12 +86,12 @@
                     <button onclick="sharePhoto()"
                         class="bg-green-600 text-white py-4 rounded-2xl font-bold shadow-lg btn-active flex flex-col items-center gap-1">
                         <span class="text-2xl">📤</span>
-                        <span>Enviar WhatsApp</span>
+                        <span>Enviar</span>
                     </button>
                     <button onclick="resetCamera()"
                         class="bg-slate-800 text-white py-4 rounded-2xl font-bold btn-active flex flex-col items-center gap-1 border border-slate-700">
                         <span class="text-2xl">📸</span>
-                        <span>Tomar otra</span>
+                        <span>Reintentar</span>
                     </button>
                 </div>
 
