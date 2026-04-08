@@ -9,7 +9,25 @@ const flashOverlay = document.getElementById('flashOverlay');
 
 let currentStream = null;
 let useFrontCamera = false;
-let locations = JSON.parse(localStorage.getItem('work_locations_v4')) || ["Entrada Principal", "Zona de Carga", "Bodega Norte", "Oficina Supervisión"];
+
+// Estructura de ubicaciones por grupos
+const defaultGroups = [
+    { label: "Clinique", items: ["Ascenseur 1", "RC"] },
+    { label: "Jean-Coutu", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "Sporting Life", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "Siam", items: ["Ascenseur 1", "Ascenseur 2"] },
+    { label: "Huston Orange", items: ["Ascenseur 1"] },
+    { label: "Banque National", items: ["Ascenseur 1", "Ascenseur 2", "RC 1", "RC 2"] },
+    { label: "Hôtel Escad", items: ["RC", "Ascenseur 1", "Ascenseur 2"] },
+    { label: "Apple & Pottery", items: ["RC", "Ascenseur 1"] },
+    { label: "Mon Coco 2e", items: ["Zamboni"] },
+    { label: "Mon Coco RC 1", items: ["Ascenseur 1", "Ascenseur 2", "RC (A)", "RC (B)", "RC (C)"] },
+    { label: "Mon Coco RC 2", items: ["RC (A)", "RC (B)"] },
+    { label: "Huston", items: ["RC"] }
+];
+
+// Cargar personalizadas de localStorage
+let customLocations = JSON.parse(localStorage.getItem('work_custom_locs_v5')) || [];
 
 // Iniciar cámara
 async function startCamera() {
@@ -41,17 +59,37 @@ function switchCamera() {
 }
 
 function renderLocations() {
-    locationSelect.innerHTML = locations.map(loc => `<option value="${loc}">${loc}</option>`).join('');
-    localStorage.setItem('work_locations_v4', JSON.stringify(locations));
+    let html = '';
+    
+    // Renderizar grupos predeterminados
+    defaultGroups.forEach(group => {
+        html += `<optgroup label="${group.label}">`;
+        group.items.forEach(item => {
+            html += `<option value="${group.label} - ${item}">${item}</option>`;
+        });
+        html += `</optgroup>`;
+    });
+
+    // Renderizar grupo de personalizadas si existen
+    if (customLocations.length > 0) {
+        html += `<optgroup label="Especiales">`;
+        customLocations.forEach(loc => {
+            html += `<option value="${loc}">${loc}</option>`;
+        });
+        html += `</optgroup>`;
+    }
+
+    locationSelect.innerHTML = html;
 }
 
 function addLocation() {
     const val = newLocationInput.value.trim();
     if (val) {
-        locations.unshift(val);
+        customLocations.unshift(val);
+        localStorage.setItem('work_custom_locs_v5', JSON.stringify(customLocations));
         renderLocations();
         newLocationInput.value = '';
-        locationSelect.selectedIndex = 0;
+        locationSelect.selectedIndex = locationSelect.options.length - 1; // Seleccionar la última añadida
     }
 }
 
@@ -71,9 +109,9 @@ captureBtn.onclick = () => {
 
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    // Diseño del Sello solo con Ubicación
+    // Diseño del Sello mejorado
     const padding = canvas.width * 0.04;
-    const fontSize = canvas.width * 0.055;
+    const fontSize = canvas.width * 0.05;
 
     ctx.font = `bold ${fontSize}px system-ui, -apple-system, sans-serif`;
     const textWidth = ctx.measureText(locText).width;
@@ -83,19 +121,19 @@ captureBtn.onclick = () => {
     const x = padding;
     const y = canvas.height - rectH - padding;
 
-    // Dibujar fondo del sello
-    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    // Dibujar fondo del sello con algo más de transparencia para que sea premium
+    ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
     if (ctx.roundRect) {
         ctx.beginPath();
-        ctx.roundRect(x, y, rectW, rectH, 15);
+        ctx.roundRect(x, y, rectW, rectH, 12);
         ctx.fill();
     } else {
         ctx.fillRect(x, y, rectW, rectH);
     }
 
-    // Dibujar Texto: Solo Ubicación
+    // Dibujar Texto
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(locText, x + padding, y + fontSize);
+    ctx.fillText(locText, x + padding, y + (fontSize * 1.05));
 
     // Mostrar el resultado final
     photoPreview.src = canvas.toDataURL('image/jpeg', 0.85);
@@ -129,7 +167,7 @@ async function sharePhoto() {
 
 function downloadPhoto() {
     const link = document.createElement('a');
-    link.download = `FOTO_${locationSelect.value}.jpg`;
+    link.download = `FOTO_${locationSelect.value.replace(/[^a-z0-9]/gi, '_')}.jpg`;
     link.href = photoPreview.src;
     link.click();
 }
